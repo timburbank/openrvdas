@@ -1,0 +1,40 @@
+{% extends "display_base.html" %}
+{% spaceless %}
+{% block title %}Test DAS Display{% endblock %}
+{% block content %}
+{% endblock %}
+{% block final %}
+<script>
+    /*// check to see if we support workers
+    if (!window.Worker){
+        window.alert('You do not support web workers!');
+        window.stop();
+    }
+
+    {% load staticfiles %}
+    var myWorker = new SharedWorker('{% static 'js/shared_worker.js' %}');
+    var message = {
+        'name': 'line_widget_0',
+        'fields': ['NBPPUSWindSpd', 'NBPSUSWindSpd',],
+    };
+
+    myWorker.port.start();
+    myWorker.port.postMessage(JSON.stringify(message));
+
+    myWorker.port.onmessage = function(e){
+      console.log(e.data);
+    };*/
+    var line_widget = new LineWidget(
+      {
+        widget: 'line',
+        time_frame: 36000,
+        fields: [
+          {
+            field: 'NBPSUSWindSpd',
+          },
+        ],
+      });
+      line_widget.initialize();
+</script>
+{% endblock %}
+{% endspaceless %}

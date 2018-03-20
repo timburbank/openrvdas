@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="Bug and Pablo" content="">
+  {% block meta %}{% endblock %}
+  {% load staticfiles %}
+  <link href="{% static 'css/dasdisplay.css' %}" rel="stylesheet">
+  <link href="{% static 'icon/favicon.ico' %}" rel="icon">
+  <script src="{% static 'js/d3.js' %}"></script>
+  <script src="{% static 'js/d3-selection-multi.js' %}"></script>
+  <script src="{% static 'js/d3-scale-chromatic.js' %}"></script>
+  <script src="{% static 'js/simplify.js' %}"></script>
+  <script src="{% static 'js/interact.js' %}"></script>
+  <script src="{% static 'js/modal.js' %}"></script>
+  <style></style>
+  <noscript><br /><h1>you must have javascript enabled to use this site</h1></noscript>
+  <script>
+
+    // Which websocket we're going to use to communicate with DisplayServer
+    var WEBSOCKET_ADDRESS = '{{ websocket }}';
+    if (WEBSOCKET_ADDRESS.search(' websocket ') > -1) {
+      WEBSOCKET_ADDRESS = location.hostname + ":8766/";
+      console.log('Received no websocket, guessing ' + WEBSOCKET_ADDRESS);
+    }
+
+    var tableModal = new Modal({ title: '<strong>Build a Table Widget!</strong>', preview: true, submitButton: true, widget: 'DASTableWidget', url: '/display/build_widget/table'});
+    var dialModal;
+    var lineModal = new Modal({ title: '<strong>Build a Line Widget!</strong>', preview: true, submitButton: true, widget: 'DASLineWidget', url: '/display/build_widget/line'});
+
+    var widget_spec_array = [];
+    var widget_array = [];
+    var edit_mode = false;
+
+    // this is a pretty ugly hack i think. open the modal, and then immediately initialize a new one, so that when you call it again, the new one is ready.
+    function lineWidgetModal(){
+      lineModal.open();
+      lineModal = new Modal({ title: '<strong>Build a Line Widget!</strong>',preview: true, submitButton: true, widget: 'DASLineWidget', url: '/display/build_widget/line'});
+    }
+    function tableWidgetModal(){
+      tableModal.open();
+      tableModal = new Modal({ title: '<strong>Build a Table Widget!</strong>',preview: true, submitButton: true, widget: 'DASTableWidget', url: '/display/build_widget/table'});
+    }
+    function load(){
+      d3.select('.no-jscript').remove();
+    }
+
+    window.onload = load;
+
+    interact('.draggable').draggable({
+      inertia: false,
+      retrict: {
+        drag: 'parent',
+        endOnly: true,
+        elementRect:{ top: 0, left: 0, bottom: 1, right: 1 }
+      },
+      autoScroll: false,
+      onmove: dragMoveListener,
+    }).ignoreFrom('input, button, select');
+
+    function dragMoveListener (event) {
+      var target = event.target,
+      x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+      y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+      target.style.webkitTransform =
+      target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+      target.setAttribute('data-x', x);
+      target.setAttribute('data-y', y);
+    }
+
+    window.dragMoveListener = dragMoveListener;
+
+    function editMode(){
+      if (!edit_mode){
+        for(i = 0; i < widget_array.length; i++){
+          var dm = document.getElementById(widget_array[i].name);
+          if (dm === null){
+            continue;
+          }
+          var style = window.getComputedStyle(dm, null);
+          var top = (parseInt(style.getPropertyValue('top')));
+          var left = (parseInt(style.getPropertyValue('left')));
+          var width = (parseInt(style.getPropertyValue('width')));
+          // console.log('name: ' + dm + 'top left width: ' + top + ' ' + left + ' ' + width);
+          dm.style.border = '2px solid #677077';
+          dm.style.boxShadow = '2px 2px 1px #333';
+          d3.select('#' + widget_array[i].name)
+            .classed('draggable', true)
+            .select('.panel-heading')
+            .append('button')
+            .classed('close-x-button', true)
+            .text('X')
+            .attr('onclick', 'deleteWidget(' + widget_array[i].name + ');')
+            .style({
+              'text-align': 'right',
+              'color': '#FF4500',
+              'opacity' : 1,
+              'text-shadow': '0 2px #8B0000',
+              'height': widget_array[i].title_size + 'px',});
+          // console.log(widget_array[i].name);
+        }
+        d3.select('#edit-button')
+          .select('a')
+          .text('Save Changes');
+          edit_mode = !edit_mode;
+        }
+        else{
+          for(i = 0; i < widget_array.length; i++){
+            var dm = document.getElementById(widget_array[i].name);
+            if (dm === null){
+              continue;
+            }
+            dm.style.border = '2px solid rgba(0,0,0,0)';
+            dm.style.boxShadow = 'none';
+            d3.select('#'+widget_array[i].name)
+              .classed('draggable', false);
+            d3.selectAll('.close-x-button')
+              .remove();
+            }
+            d3.select('#edit-button')
+              .select('a')
+              .text('Edit Page');
+            edit_mode = !edit_mode;
+          }
+        }
+
+      function deleteWidget(name){
+        console.log('deleting: ' + name);
+        for(i = 0; i < widget_array.length; i++){
+          if (widget_array[i].name === name.id){
+            widget_array[i].remove();
+            widget_array.splice(i,1);
+            break;
+          }
+        }
+      }
+      function setEdited(name){
+        console.log('set edited: ' + name.name);
+        for(i = 0; i < widget_array.length; i++){
+          if (widget_array[i].name === name.id){
+            widget_array[i].edited = true;
+            break;
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class='main'>
+    <nav class"navbar">
+      <div class="nav-content">
+        <ul>
+          <li class="logo"><a href="{% url 'display:index' %}">DAS Display</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropbtn">Select a Display</a>
+            <div class="dropdown-content">
+              <!--<a href="{% url 'display:demo' %}" >Demo</a>
+              <<a href="{% url 'display:simple' %}" >Simple</a>-->
+              <a href="{% url 'display:testing' %}" >Test Page</a>
+            </div>
+          </li><li class="dropdown">
+            <a href="#" class="dropbtn">Add a Widget</a>
+            <div class="dropdown-content">
+              <!--<a href="#" onClick="lineWidgetModal();">Line Widget</a>
+              <a href="#" onClick="tableWidgetModal();">Table Widget</a>-->
+            </div>
+          </li>
+          <li><a href="{% url 'display:readme' %}">About</a></li>
+          <li><a href="{% url 'display:license' %}">License</a></li>
+          <li style="float:right" id="edit-button"><a href="#" onclick="editMode(); ">Edit Page</a></li>
+        </ul>
+      </div>
+    </nav>
+    <div class="container-content" id="container-content">
+      {% block content %}{% endblock %}
+    </div>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!--{% if use_xmlhttp %}
+      <script src="{% static 'js/widget_base.js' %}"></script>
+    {% else %}
+      <script src="{% static 'js/ws_widget_base.js' %}"></script>
+      {% endif %}-->
+
+    <!--<script src="{% static 'js/line_widget.js' %}"></script>
+    <script src="{% static 'js/testWS.js' %}"></script>
+    <script src="{% static 'js/table_widget.js' %}"></script>
+    <script src="{% static 'js/dial_widget.js' %}"></script>
+    <script src="{% static 'js/scatter_widget.js' %}"></script>
+    <script src="{% static 'js/DASWidget.js' %}"></script>-->
+    <script src="{% static 'js/newLineWidget.js' %}"></script>
+    <div class="final" id="final">
+      {% block final %}{% endblock %}
+    </div>
+  </body>
+</html>
