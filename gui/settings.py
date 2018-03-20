@@ -27,11 +27,12 @@ DEBUG = True
 
 import socket
 HOSTNAME = socket.gethostname()
+HOSTNAME = socket.gethostbyname(socket.gethostname() + '.local')
 
-ALLOWED_HOSTS = [HOSTNAME, 'localhost']
+ALLOWED_HOSTS = [HOSTNAME, 'localhost',]
 
 # Hack to just run locally without worrying about opening ports
-HOSTNAME = 'localhost'
+#HOSTNAME = 'localhost'
 
 WEBSOCKET_HOST = HOSTNAME
 WEBSOCKET_PORT = 8765
@@ -128,5 +129,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
+STATIC_ROOT = BASE_DIR + '/gui/static/'
+
+STATICFILES_DIRS = (
+    ('css', STATIC_ROOT + '/css/'),
+    ('js', STATIC_ROOT + '/js/'),
+    ('icon', STATIC_ROOT + '/icon/'),
+)
 
 STATIC_URL = '/static/'

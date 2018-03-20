@@ -152,13 +152,11 @@
     <nav class"navbar">
       <div class="nav-content">
         <ul>
-          <li class="logo"><a href="{% url 'display:index' %}">DAS Display</a></li>
+          <li class="logo"><a href="{% url 'index' %}">DAS Display</a></li>
           <li class="dropdown">
             <a href="#" class="dropbtn">Select a Display</a>
             <div class="dropdown-content">
-              <!--<a href="{% url 'display:demo' %}" >Demo</a>
-              <<a href="{% url 'display:simple' %}" >Simple</a>-->
-              <a href="{% url 'display:testing' %}" >Test Page</a>
+              <a href="{% url 'testing' %}" >Test Page</a>
             </div>
           </li><li class="dropdown">
             <a href="#" class="dropbtn">Add a Widget</a>
@@ -167,8 +165,7 @@
               <a href="#" onClick="tableWidgetModal();">Table Widget</a>-->
             </div>
           </li>
-          <li><a href="{% url 'display:readme' %}">About</a></li>
-          <li><a href="{% url 'display:license' %}">License</a></li>
+          <li><a href="{% url 'license' %}">License</a></li>
           <li style="float:right" id="edit-button"><a href="#" onclick="editMode(); ">Edit Page</a></li>
         </ul>
       </div>

@@ -50,7 +50,7 @@ def index(request):
     # Did we get a configuration file?
     if request.FILES.get('config_file', None):
       config_file = request.FILES['config_file']
-      config_contents = config_file.read() 
+      config_contents = config_file.read()
       logging.warning('Uploading file "%s"...', config_file.name)
 
       try:
@@ -64,7 +64,7 @@ def index(request):
     elif request.POST.get('select_mode', None):
       new_mode_name = request.POST['select_mode']
       logging.warning('switching to mode "%s"', new_mode_name)
-      cruise = CurrentCruise.objects.latest('as_of').cruise      
+      cruise = CurrentCruise.objects.latest('as_of').cruise
       new_mode = Mode.objects.get(name=new_mode_name, cruise=cruise)
       current_mode = new_mode
       cruise.current_mode = new_mode
@@ -72,7 +72,7 @@ def index(request):
 
       # Find the config that matches the new mode for each logger. If
       # no config for a logger, that means the logger isn't supposed
-      # to be running in this mode. 
+      # to be running in this mode.
       for logger in Logger.objects.all():
         config_set = LoggerConfig.objects.filter(logger=logger, mode=new_mode)
         config_set_size = config_set.count()
@@ -182,7 +182,7 @@ def server_messages(request, server):
 ################################################################################
 def edit_config(request, logger_name):
   logger = Logger.objects.get(name=logger_name)
-  
+
   ############################
   # If we've gotten a POST request
   if request.method == 'POST':
@@ -205,7 +205,7 @@ def edit_config(request, logger_name):
     # Set the config to be its logger's desired_config
     logger.desired_config = desired_config
     logger.save()
-    
+
     # Close window once we've done our processing
     return HttpResponse('<script>window.close()</script>')
 
@@ -233,7 +233,7 @@ def load_config(request):
     if request.FILES.get('config_file', None):
 
       config_file = request.FILES['config_file']
-      config_contents = config_file.read() 
+      config_contents = config_file.read()
       logging.warning('Uploading file "%s"...', config_file.name)
 
       try:
@@ -279,3 +279,11 @@ def widget(request, field_list=''):
 
   # Render what we've ended up with
   return render(request, 'gui/widget.html', template_vars)
+################################################################################
+# for the testing page
+def testing(request):
+  return render(request, 'gui/testing.html')
+################################################################################
+# for the licensing page
+def license(request):
+  return render(request, 'gui/license.html')
