@@ -22,6 +22,10 @@
     // ***************************************************************************
     let tempArray = window.crypto.getRandomValues(new Uint32Array(1));
     let randomWidgetName = tempArray[0];
+    let ws;
+    let message = [];
+    let retry_interval = 3000;
+    let retry_websocket_connection;
 
     // default values
     // ***************************************************************************
@@ -60,7 +64,7 @@
       y_scale: 'linear',
       x_axis_side: 'bottom',
       y_axis_side: 'right',
-      backfill_sec: '0', // number of seconds of data to backfill in, if any.
+      backfill_sec: 0, // number of seconds of data to backfill in, if any.
     };
 
     // use supplied arguments, or set to defaults
@@ -93,11 +97,40 @@
 
   // public functions
   // ***************************************************************************
+  
+  /*
   this.LineWidget.prototype.initialize = function(){
     console.log(this.options);
     initParams.call(this);
     _this.running = true;
     getData.call(this);
+  };
+  */
+
+/*
+    var message = [];
+    for (var i = 0; i < fields.length; i++) {
+      message.push([fields[i], num_secs]);
+    }
+    console.log("Initialization message: " + JSON.stringify(message));
+    return message;
+*/
+  this.LineWidget.prototype.initalize = function(){
+    console.log(this.options);
+    initParams.call(this);
+  };
+
+  this.LineWidget.prototype.ws_setup = function(){
+    console.log('setting up ws\n');    
+    console.log('field length: ' + _this.fields.length);
+
+    for (let i = 0; i < _this.fields.length; i++){
+      message.push([_this.fields[i].field, _this.backfill_sec]);
+    }
+    console.log("Initialization message: " + JSON.stringify(message));
+
+    console.log("Trying to reconnect to websocket_server");
+    ws = new WebSocket("ws://{{ websocket_server }}/data");
   };
 
   this.LineWidget.prototype.data = function(){
@@ -118,6 +151,30 @@
 
   // private functions
   // ***************************************************************************
+  ws.onopen = function() {
+    // We've succeeded in opening - don't try anymore
+    console.log("Connected - clearing retry interval");
+    clearTimeout(retry_websocket_connection);
+    // Web Socket is connected, send data using send()
+    ws.send(JSON.stringify(message));
+    console.log("Sent initial message: " +
+                 JSON.stringify(message));
+  };
+
+  ws.onclose = function() { 
+    // websocket is closed.
+    console.log("Connection is closed...");
+    // Set up an alarm to sleep, then try re-opening websocket
+    console.log("Setting timer to reconnect");
+    retry_websocket_connection = setTimeout(connect_websocket,
+                                            retry_interval);
+  };
+
+  ws.onmessage = function (received_message) {
+    //console.log("message: " + received_message.data);
+    process_message(JSON.parse(received_message.data));
+  };
+
   function getData(){
     // console.log('getData');
     // check to make sure that we are running and have fields

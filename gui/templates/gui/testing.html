@@ -12,6 +12,7 @@
         window.stop();
     }
 
+    {% load staticfiles %}
     var myWorker = new SharedWorker('{% static 'js/shared_worker.js' %}');
     var message = {
         'name': 'line_widget_0',
@@ -25,7 +26,6 @@
       console.log(e.data);
     }; 
  */
-  {% load staticfiles %}
 
   var line_widget = new LineWidget(
   {
@@ -33,11 +33,12 @@
     time_frame: 36000,
     fields: [
       {
-        field: 'NBPSUSWindSpd',
+        field: 'S330Pitch',
       },
     ],
   });
 
+  // stub for widget init
   function initialize_widgets(){
     return false;
   }
