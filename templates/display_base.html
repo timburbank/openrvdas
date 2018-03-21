@@ -26,9 +26,7 @@
     }
 
     // setup websockets
-    var ws;
-    var retry_interval = 3000;
-    var retry_websocket_connection;
+    var websocket_address = 'ws://{{ websocket_server }}/data';
 
     // Which websocket we're going to use to communicate with DisplayServer
    /* var WEBSOCKET_ADDRESS = '{{ websocket }}';
