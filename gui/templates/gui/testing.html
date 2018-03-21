@@ -5,13 +5,13 @@
 {% endblock %}
 {% block final %}
 <script>
-    /*// check to see if we support workers
+/*
+    // check to see if we support workers
     if (!window.Worker){
         window.alert('You do not support web workers!');
         window.stop();
     }
 
-    {% load staticfiles %}
     var myWorker = new SharedWorker('{% static 'js/shared_worker.js' %}');
     var message = {
         'name': 'line_widget_0',
@@ -23,18 +23,24 @@
 
     myWorker.port.onmessage = function(e){
       console.log(e.data);
-    };*/
-/*    var line_widget = new LineWidget(
+    }; 
+ */
+  {% load staticfiles %}
+
+  var line_widget = new LineWidget(
+  {
+    widget: 'line',
+    time_frame: 36000,
+    fields: [
       {
-        widget: 'line',
-        time_frame: 36000,
-        fields: [
-          {
-            field: 'NBPSUSWindSpd',
-          },
-        ],
-      });
-      line_widget.initialize();*/
+        field: 'NBPSUSWindSpd',
+      },
+    ],
+  });
+
+  function initialize_widgets(){
+    return false;
+  }
 </script>
 {% endblock %}
 {% endspaceless %}

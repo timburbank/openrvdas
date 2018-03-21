@@ -60,6 +60,7 @@
       y_scale: 'linear',
       x_axis_side: 'bottom',
       y_axis_side: 'right',
+      backfill_sec: '0', // number of seconds of data to backfill in, if any.
     };
 
     // use supplied arguments, or set to defaults

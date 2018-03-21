@@ -17,6 +17,18 @@
   <style></style>
   <noscript><br /><h1>you must have javascript enabled to use this site</h1></noscript>
   <script>
+    // run our onload function
+    window.onload = load
+
+    // check to see if websockets are supported.
+    if (! "WebSocket" in window) {
+      alert("Warning: websockets not supported by your Browser! You cannot use this site without them.");
+    }
+
+    // setup websockets
+    var ws;
+    var retry_interval = 3000;
+    var retry_websocket_connection;
 
     // Which websocket we're going to use to communicate with DisplayServer
    /* var WEBSOCKET_ADDRESS = '{{ websocket }}';
@@ -42,12 +54,14 @@
       tableModal.open();
       tableModal = new Modal({ title: '<strong>Build a Table Widget!</strong>',preview: true, submitButton: true, widget: 'DASTableWidget', url: '/display/build_widget/table'});
     }*/
+
+    // stuff to run after the page has loaded
     function load(){
+      // remove the javascript warning
       d3.select('.no-jscript').remove();
     }
 
-    window.onload = load;
-
+    // code to make stuff draggable and interactable. should be moved out to it's own js file.
     interact('.draggable').draggable({
       inertia: false,
       retrict: {
@@ -147,6 +161,8 @@
         }
       }
     </script>
+
+
   </head>
   <body class='main'>
     <nav class"navbar">
