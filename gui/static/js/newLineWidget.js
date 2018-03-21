@@ -64,7 +64,7 @@
       y_scale: 'linear',
       x_axis_side: 'bottom',
       y_axis_side: 'right',
-      backfill_sec: 0, // number of seconds of data to backfill in, if any.
+      backfill_sec: 30, // number of seconds of data to backfill in, if any.
     };
 
     // use supplied arguments, or set to defaults
@@ -121,7 +121,7 @@
     initParams.call(this);
   };
 
-  this.LineWidget.prototype.ws_setup = function(){
+  this.LineWidget.prototype.websocket_setup = function(){
     console.log('setting up ws\n');    
     console.log('field length: ' + _this.fields.length);
 
@@ -175,14 +175,41 @@
 
     ws.onmessage = function (received_message) {
       console.log("message: " + received_message.data);
-      //process_message(JSON.parse(received_message.data));
+      process_message(JSON.parse(received_message.data));
+    };
+
+    window.onbeforeunload = function(event) {
+      console.log("Closing websocket");
+      ws.close();
     };
   }
 
+  function process_message(new_message){
+    let received_message = new_message;
+    console.log(received_message.length);
+    /*
+    for (let i = 0; i < _this.fields.length; i++){
+      if (_this.fields[i].field in _this.field_values){
+        if ((_this.fields[i].data.length !== 0) && (_this.field_times[_this.fields[i].field] === _this.fields[i].data[_this.fields[i].data.length -1].x) && (_this.field_values[_this.fields[i].field] === _this.fields[i].data[_this.fields[i].data.length -1].y)){
+          console.debug('continue');
+          continue;
+        }
+        _this.fields[i].data.push({'x': parseInt(_this.field_times[_this.fields[i].field]), 'y': parseFloat(_this.field_values[_this.fields[i].field])});
+        _this.time = parseFloat(_this.field_times[_this.fields[i].field]);
+        _this.fields[i].duration.push(Date.now());
+        while (_this.fields[i].duration.length > 1){
+          _this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
+          _this.fields[i].duration.shift();
+        }
+      }
+    }
+    */
+  };
+
   function getData(){
-    // console.log('getData');
+    console.log('getData');
     // check to make sure that we are running and have fields
-    if (_this.running === false){
+    /*if (_this.running === false){
       console.log('not running');
       return;
     }
@@ -240,7 +267,7 @@
       }
       update.call(this);
     }).bind(this);
-    xhr.send(form_data);
+    xhr.send(form_data);*/
   }
 
   // updates the widget data array
