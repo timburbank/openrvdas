@@ -129,7 +129,7 @@
       message.push([_this.fields[i].field, _this.backfill_sec]);
     }
     console.log("Initialization message: " + JSON.stringify(message));
-    connect_websocket(message).call(this);
+    connect_websocket.call(this, message);
   };
 
   this.LineWidget.prototype.data = function(){
@@ -173,7 +173,7 @@
                                               retry_interval);
     };
 
-    this.ws.onmessage = function (received_message) {
+    ws.onmessage = function (received_message) {
       console.log("message: " + received_message.data);
       //process_message(JSON.parse(received_message.data));
     };
