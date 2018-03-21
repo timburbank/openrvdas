@@ -186,7 +186,21 @@
 
   function process_message(new_message){
     let received_message = new_message;
-    console.log(received_message.length);
+    let keys = Object.keys(received_message);
+    //console.log(received_message.S330Pitch);
+    console.log('fields: ' + _this.fields);
+    console.log('  keys: ' + Object.keys(received_message));
+    console.log(typeof keys[0]);
+    console.log(typeof _this.fields[0].field);
+
+    for (let i = 0; i < _this.fields.length; i++){
+      console.log('field: ' + _this.fields[i].field);
+      if (received_message.hasOwnProperty(_this.fields[i].field)){
+      //if (keys.hasOwnProperty(_this.fields[i].field)){
+      //if (_this.fields[i].field in keys){
+        console.log(_this.fields[i].field + ': received\n');
+      }
+    }
     /*
     for (let i = 0; i < _this.fields.length; i++){
       if (_this.fields[i].field in _this.field_values){
