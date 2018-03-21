@@ -19,7 +19,7 @@
   <script>
 
     // Which websocket we're going to use to communicate with DisplayServer
-    var WEBSOCKET_ADDRESS = '{{ websocket }}';
+   /* var WEBSOCKET_ADDRESS = '{{ websocket }}';
     if (WEBSOCKET_ADDRESS.search(' websocket ') > -1) {
       WEBSOCKET_ADDRESS = location.hostname + ":8766/";
       console.log('Received no websocket, guessing ' + WEBSOCKET_ADDRESS);
@@ -28,20 +28,20 @@
     var tableModal = new Modal({ title: '<strong>Build a Table Widget!</strong>', preview: true, submitButton: true, widget: 'DASTableWidget', url: '/display/build_widget/table'});
     var dialModal;
     var lineModal = new Modal({ title: '<strong>Build a Line Widget!</strong>', preview: true, submitButton: true, widget: 'DASLineWidget', url: '/display/build_widget/line'});
-
+*/
     var widget_spec_array = [];
     var widget_array = [];
     var edit_mode = false;
 
     // this is a pretty ugly hack i think. open the modal, and then immediately initialize a new one, so that when you call it again, the new one is ready.
-    function lineWidgetModal(){
+    /*function lineWidgetModal(){
       lineModal.open();
       lineModal = new Modal({ title: '<strong>Build a Line Widget!</strong>',preview: true, submitButton: true, widget: 'DASLineWidget', url: '/display/build_widget/line'});
     }
     function tableWidgetModal(){
       tableModal.open();
       tableModal = new Modal({ title: '<strong>Build a Table Widget!</strong>',preview: true, submitButton: true, widget: 'DASTableWidget', url: '/display/build_widget/table'});
-    }
+    }*/
     function load(){
       d3.select('.no-jscript').remove();
     }
