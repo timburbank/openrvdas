@@ -59,7 +59,7 @@
       line_thickness: 3,
       tolerance: 0.5,
       time: Date.now(), // should be time + duration
-      random_color: function(){ return Math.floor(Math.random() * (255)); },
+      //random_color: function(){ return Math.floor(Math.random() * (255)); },
       x_scale: 'time',
       y_scale: 'linear',
       x_axis_side: 'bottom',
@@ -117,6 +117,7 @@
 */
   this.LineWidget.prototype.initalize = function(){
     console.log(this.options);
+    console.log(random_color());
     initParams.call(this);
   };
 
@@ -125,12 +126,10 @@
     console.log('field length: ' + _this.fields.length);
 
     for (let i = 0; i < _this.fields.length; i++){
-      this.message.push([_this.fields[i].field, _this.backfill_sec]);
+      message.push([_this.fields[i].field, _this.backfill_sec]);
     }
-    console.log("Initialization message: " + JSON.stringify(this.message));
-
-    console.log("Trying to reconnect to websocket_server");
-    this.ws = new WebSocket("ws://{{ websocket_server }}/data");
+    console.log("Initialization message: " + JSON.stringify(message));
+    connect_websocket(message);
   };
 
   this.LineWidget.prototype.data = function(){
@@ -151,28 +150,33 @@
 
   // private functions
   // ***************************************************************************
-  this.ws.onopen = function() {
-    // We've succeeded in opening - don't try anymore
-    console.log("Connected - clearing retry interval");
-    clearTimeout(this.retry_websocket_connection);
-    // Web Socket is connected, send data using send()
-    this.ws.send(JSON.stringify(this.message));
-    console.log("Sent initial message: " +
-                 JSON.stringify(this.message));
-  };
+  function connect_websocket(message) {
+    console.log("Trying to reconnect to websocket_server");
+    ws = new WebSocket("ws://{{ websocket_server }}/data");
 
-  this.ws.onclose = function() { 
-    // websocket is closed.
-    console.log("Connection is closed...");
-    // Set up an alarm to sleep, then try re-opening websocket
-    console.log("Setting timer to reconnect");
-    this.retry_websocket_connection = setTimeout(this.connect_websocket,
-                                            this.retry_interval);
-  };
+    ws.onopen = function() {
+      // We've succeeded in opening - don't try anymore
+      console.log("Connected - clearing retry interval");
+      clearTimeout(retry_websocket_connection);
+      // Web Socket is connected, send data using send()
+      ws.send(JSON.stringify(message));
+      console.log("Sent initial message: " +
+                   JSON.stringify(message));
+    };
 
-  this.ws.onmessage = function (received_message) {
-    console.log("message: " + received_message.data);
-    //process_message(JSON.parse(received_message.data));
+    ws.onclose = function() { 
+      // websocket is closed.
+      console.log("Connection is closed...");
+      // Set up an alarm to sleep, then try re-opening websocket
+      console.log("Setting timer to reconnect");
+      retry_websocket_connection = setTimeout(connect_websocket,
+                                              retry_interval);
+    };
+
+    this.ws.onmessage = function (received_message) {
+      console.log("message: " + received_message.data);
+      //process_message(JSON.parse(received_message.data));
+    };
   };
 
   function getData(){
