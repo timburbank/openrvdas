@@ -30,7 +30,7 @@ restarts them if they should be and are not.
 The StatusServer and LoggerServer can be run manually from the command
 line as well, using the expected invocation:
 
-  gui/status_server.py
+  gui/logger_server.py
   gui/status_server.py
 
 Use the --help flag to see what options are available with each.
@@ -96,7 +96,7 @@ class WriteToDjangoHandler(logging.Handler):
     self.formatter = logging.Formatter(LOGGING_FORMAT)
       
   def emit(self, record):
-    print('Saving Logger ServerMessage: %s' % record)
+    print('Saving Logger ServerMessage: %s' % record.getMessage())
     message = ServerMessage(server=self.logger_name,
                             message=self.formatter.format(record))
     message.save()
