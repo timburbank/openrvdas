@@ -15,18 +15,18 @@
  /*jshint esversion: 6 */
 
 (function(){
-  // constructor
+  // globals
+  // ***************************************************************************
+  let tempArray = window.crypto.getRandomValues(new Uint32Array(1));
+  let randomWidgetName = tempArray[0];
+  let ws;
+  let message = [];
+  let retry_interval = 3000;
+  let retry_websocket_connection;
   let _this;
+  
+  // constructor
   this.LineWidget = function(){
-    // globals
-    // ***************************************************************************
-    let tempArray = window.crypto.getRandomValues(new Uint32Array(1));
-    let randomWidgetName = tempArray[0];
-    let ws;
-    let message = [];
-    let retry_interval = 3000;
-    let retry_websocket_connection;
-
     // default values
     // ***************************************************************************
     var defaults = {
@@ -129,7 +129,7 @@
       message.push([_this.fields[i].field, _this.backfill_sec]);
     }
     console.log("Initialization message: " + JSON.stringify(message));
-    connect_websocket(message);
+    connect_websocket(message).call(this);
   };
 
   this.LineWidget.prototype.data = function(){
@@ -177,7 +177,7 @@
       console.log("message: " + received_message.data);
       //process_message(JSON.parse(received_message.data));
     };
-  };
+  }
 
   function getData(){
     // console.log('getData');
