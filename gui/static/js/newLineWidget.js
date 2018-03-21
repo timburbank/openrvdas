@@ -125,12 +125,12 @@
     console.log('field length: ' + _this.fields.length);
 
     for (let i = 0; i < _this.fields.length; i++){
-      message.push([_this.fields[i].field, _this.backfill_sec]);
+      this.message.push([_this.fields[i].field, _this.backfill_sec]);
     }
-    console.log("Initialization message: " + JSON.stringify(message));
+    console.log("Initialization message: " + JSON.stringify(this.message));
 
     console.log("Trying to reconnect to websocket_server");
-    ws = new WebSocket("ws://{{ websocket_server }}/data");
+    this.ws = new WebSocket("ws://{{ websocket_server }}/data");
   };
 
   this.LineWidget.prototype.data = function(){
@@ -151,28 +151,28 @@
 
   // private functions
   // ***************************************************************************
-  ws.onopen = function() {
+  this.ws.onopen = function() {
     // We've succeeded in opening - don't try anymore
     console.log("Connected - clearing retry interval");
-    clearTimeout(retry_websocket_connection);
+    clearTimeout(this.retry_websocket_connection);
     // Web Socket is connected, send data using send()
-    ws.send(JSON.stringify(message));
+    this.ws.send(JSON.stringify(this.message));
     console.log("Sent initial message: " +
-                 JSON.stringify(message));
+                 JSON.stringify(this.message));
   };
 
-  ws.onclose = function() { 
+  this.ws.onclose = function() { 
     // websocket is closed.
     console.log("Connection is closed...");
     // Set up an alarm to sleep, then try re-opening websocket
     console.log("Setting timer to reconnect");
-    retry_websocket_connection = setTimeout(connect_websocket,
-                                            retry_interval);
+    this.retry_websocket_connection = setTimeout(this.connect_websocket,
+                                            this.retry_interval);
   };
 
-  ws.onmessage = function (received_message) {
-    //console.log("message: " + received_message.data);
-    process_message(JSON.parse(received_message.data));
+  this.ws.onmessage = function (received_message) {
+    console.log("message: " + received_message.data);
+    //process_message(JSON.parse(received_message.data));
   };
 
   function getData(){
