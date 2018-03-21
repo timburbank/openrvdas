@@ -188,17 +188,16 @@
     let received_message = new_message;
     let keys = Object.keys(received_message);
     //console.log(received_message.S330Pitch);
-    console.log('fields: ' + _this.fields);
-    console.log('  keys: ' + Object.keys(received_message));
-    console.log(typeof keys[0]);
-    console.log(typeof _this.fields[0].field);
 
     for (let i = 0; i < _this.fields.length; i++){
-      console.log('field: ' + _this.fields[i].field);
+      console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
+        //console.log(received_message[_this.fields[i].field][0]);
       //if (keys.hasOwnProperty(_this.fields[i].field)){
       //if (_this.fields[i].field in keys){
-        console.log(_this.fields[i].field + ': received\n');
+        console.log('received: ' + _this.fields[i].field);
+        console.log('    time: ' + received_message[_this.fields[i].field][0][0]);
+        console.log('    data: ' + received_message[_this.fields[i].field][0][1]);
       }
     }
     /*
