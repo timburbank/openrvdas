@@ -376,7 +376,7 @@
 
       _this.fields[i].line_selection.interrupt()
             .transition()
-            .duration(_this.duration)
+            .duration(_this.fields[i].duration[1] - _this.fields[i].duration[0])
             .ease(d3.easeLinear)
             .attr('transform', 'translate(' + x + ',' + _this.margin + ')');
 
