@@ -189,29 +189,32 @@
     let keys = Object.keys(received_message);
 
     for (let i = 0; i < _this.fields.length; i++){
-      console.log('\n   field: ' + _this.fields[i].field);
+      //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
         //console.log(received_message[_this.fields[i].field][0]);
-        console.log('\n   received: ' + _this.fields[i].field);
+        //console.log('\n   received: ' + _this.fields[i].field);
         
-        console.log('data points: ' + received_message[_this.fields[i].field].length);
+        //console.log('data points: ' + received_message[_this.fields[i].field].length);
         for (let j = 0; j < received_message[_this.fields[i].field].length; j++){
           // [j][0] is time
           // [j][1] is data
-          console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
-          console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
+          //console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
+          //console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
           _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0] * 1000), 
                                      'y': parseFloat(received_message[_this.fields[i].field][j][1])});
           _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
           _this.fields[i].duration.push(_this.time);
-          console.log('    time is: ' + _this.time + '\n');
+          //console.log('    time is: ' + _this.time + '\n');
         }
 
         if (_this.fields[i].data.length < 2){
           console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
           continue;
         }
-        console.log('hit end');
+        while (_this.fields[i].duration.length > 1){
+          _this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
+          _this.fields[i].duration.shift();
+        }
       }
       draw.call(this);
     }
@@ -385,11 +388,11 @@
       }
 */
       // have the last two pints gone off the chart? if so shift the array by one
-      if (_this.fields[i].data.length > 2) {
-        while (_this.xScale(_this.fields[i].data[2].x) < 0){
-          console.log('shift');
-          _this.fields[i].data.shift();
-        }
+      // also, make sure we keep at least a few points around.
+      while ((_this.fields[i].data.length > 2) && (_this.xScale(_this.fields[i].data[2].x) < 0)){
+        console.log('shift');
+        _this.fields[i].data.shift();
+        console.log(_this.fields[i].data);
       }
 
       _this.fields[i].line_selection.attr('d', _this.fields[i].line)
