@@ -361,7 +361,8 @@
         continue;
       }*/
 
-      let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
+      //let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
+      let x = -(_this.xScale(data[data.length-1].x) -_this.xScale.range()[0]);
       //console.log('x: '+ x);
       //console.log(_this.fields[i].data[_this.fields[i].data.length -1].x - _this.fields[i].data[_this.fields[i].data.length-2].x);
       //let x = _this.xScale.range()[1] / ((parseInt(_this.time_frame) - _this.duration * 5) / _this.duration);
@@ -378,8 +379,8 @@
             .transition()
             .duration(_this.fields[i].duration[1] - _this.fields[i].duration[0])
             .ease(d3.easeLinear)
-            .attr('transform', 'translate(' + -(xScale(data[data.length-1].x) -xScale.range()[0]) + ',' + margin + ')');
-            //.attr('transform', 'translate(' + x + ',' + _this.margin + ')');
+            //.attr('transform', 'translate(' + -(_this.xScale(data[data.length-1].x) -_this.xScale.range()[0]) + ',' + _this.margin + ')');
+            .attr('transform', 'translate(' + x + ',' + _this.margin + ')');
 
 //      _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
 
