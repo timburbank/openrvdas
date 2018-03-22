@@ -198,13 +198,13 @@
         for (let j = 0; j < received_message[_this.fields[i].field].length; j++){
           // [j][0] is time
           // [j][1] is data
-          console.log('       time: ' + received_message[_this.fields[i].field][j][0]);
+          console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
           console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
-          _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0]), 
+          _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0] * 1000), 
                                      'y': parseFloat(received_message[_this.fields[i].field][j][1])});
           _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
           _this.fields[i].duration.push(_this.time);
-          console.log('    time is: ' + _this.time);
+          console.log('    time is: ' + _this.time + '\n');
         }
 
         if (_this.fields[i].data.length < 2){
@@ -213,6 +213,7 @@
         }
         console.log('hit end');
       }
+      draw.call(this);
     }
     /*
     for (let i = 0; i < _this.fields.length; i++){
@@ -386,6 +387,7 @@
       // have the last two pints gone off the chart? if so shift the array by one
       if (_this.fields[i].data.length > 2) {
         while (_this.xScale(_this.fields[i].data[2].x) < 0){
+          console.log('shift');
           _this.fields[i].data.shift();
         }
       }
