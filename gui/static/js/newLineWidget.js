@@ -203,16 +203,24 @@
           _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0] * 1000), 
                                      'y': parseFloat(received_message[_this.fields[i].field][j][1])});
           _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
-          _this.fields[i].duration.push(_this.time);
-          console.log('    time is: ' + Date.now() + '\n');
+          //_this.fields[i].duration.push(_this.time);
         }
 
         if (_this.fields[i].data.length < 2){
           console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
           continue;
         }
-        while (_this.fields[i].duration.length > 1){
-          _this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
+        _this.fields[i].duration.push(Date.now());
+        while (_this.fields[i].duration.length > 3){
+          _this.duration = 0;
+          for (let k = 0; k < 3; k+=2){
+            console.log(k);
+            if (_this.fields[i].duration[k+1] - _this.fields[i].duration[k] > _this.duration){
+              _this.duration = Math.ceil(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]);
+            }
+          }
+          //_this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]));
+          //_this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
           _this.fields[i].duration.shift();
         }
       }
@@ -323,8 +331,9 @@
         }*/
         _this.fields[i].duration.push(Date.now());
         while (_this.fields[i].duration.length > 1){
-          _this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
+          _this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]))
           _this.fields[i].duration.shift();
+          console.log('duration shift');
         }
       }
     }
@@ -364,7 +373,7 @@
       _this.fields[i].line = d3.line()
         .x(function(d) { return _this.xScale(d.x); })
         .y(function(d) { return _this.yScale(d.y); })
-        .curve(_this.fields[j].curve);
+        .curve(_this.fields[i].curve);
 
       let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
       //let x = -(_this.xScale(_this.fields[i].data[_this.fields[i].data.length-1].x) -_this.xScale.range()[0]);
@@ -380,9 +389,11 @@
 
       _this.fields[i].line_selection.datum(_this.fields[i].data);
 
+      console.log(typeof _this.duration + ': ' + _this.duration);
       _this.fields[i].line_selection.interrupt()
             .transition()
-            .duration(_this.fields[i].duration[1] - _this.fields[i].duration[0])
+            //.duration(1000)
+            .duration(parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0])))
             .ease(d3.easeLinear)
             //.attr('transform', 'translate(' + -(_this.xScale(data[data.length-1].x) -_this.xScale.range()[0]) + ',' + _this.margin + ')');
             .attr('transform', 'translate(' + x + ',' + _this.margin + ')');
