@@ -399,7 +399,8 @@
       _this.fields[i].line_selection.interrupt()
             .transition()
             //.duration(1000)
-            .duration(parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0])))
+            .duration(_this.duration)
+            //.duration(parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0])))
             .ease(d3.easeLinear)
             //.attr('transform', 'translate(' + -(_this.xScale(data[data.length-1].x) -_this.xScale.range()[0]) + ',' + _this.margin + ')');
             .attr('transform', 'translate(' + x + ',' + _this.margin + ')');
