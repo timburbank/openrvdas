@@ -188,15 +188,16 @@
     let received_message = new_message;
     let keys = Object.keys(received_message);
 
-    if (_this.fields[0].duration.length >= 9){
+    /*if (_this.fields[0].duration.length >= 9){
       _this.duration = 0; 
       console.log('reset dur: ' + _this.duration);
-    }
+    }*/
 
     for (let i = 0; i < _this.fields.length; i++){
       //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
-        _this.fields[i].duration.push(Date.now());
+        _this.time = Date.now();
+        //_this.fields[i].duration.push(Date.now());
         //console.log(received_message[_this.fields[i].field][0]);
         //console.log('\n   received: ' + _this.fields[i].field);
         
@@ -208,7 +209,7 @@
           //console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
           _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0] * 1000), 
                                      'y': parseFloat(received_message[_this.fields[i].field][j][1])});
-          _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
+          //_this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
           //_this.fields[i].duration.push(_this.time);
         }
 
@@ -216,12 +217,13 @@
           console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
           continue;
         }
-        while (_this.fields[i].duration.length > 9){
+        _this.duration = Math.abs(Math.ceil(_this.fields[i].data[_this.fields[i].data.length -2].x - _this.time));
+        /*while (_this.fields[i].duration.length > 9){
           for (let k = 0; k < 3; k+=2){
             if (Math.abs(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]) > _this.duration){
               _this.duration = Math.abs(Math.ceil(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]));
             }
-          }
+          }*/
           //_this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]));
           //_this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
           _this.fields[i].duration.shift();
