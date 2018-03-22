@@ -188,14 +188,11 @@
     let received_message = new_message;
     let keys = Object.keys(received_message);
 
-    try{
-      if (_this.fields[0].duration.length >= 3){
-        _this.duration = 0; 
-        console.log(_this.duration);
-      }
-    }catch(e){
-      console.log(e);
+    if (_this.fields[0].duration.length >= 3){
+      _this.duration = 0; 
+      console.log('reset dur: ' + _this.duration);
     }
+
     for (let i = 0; i < _this.fields.length; i++){
       //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
