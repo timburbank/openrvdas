@@ -375,11 +375,6 @@
         continue;
       }*/
 
-      _this.fields[i].line = d3.line()
-        .x(function(d) { return _this.xScale(d.x); })
-        .y(function(d) { return _this.yScale(d.y); })
-        .curve(_this.fields[i].curve);
-
       let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
       //let x = -(_this.xScale(_this.fields[i].data[_this.fields[i].data.length-1].x) -_this.xScale.range()[0]);
       console.log('x: '+ x);
