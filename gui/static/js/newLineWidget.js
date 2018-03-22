@@ -375,10 +375,11 @@
       console.log('real duration: ' + (_this.time - _this.last_time));
       console.log('data duration: ' + (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x));
 
-      while (_this.time - _this.last_time < _this.duration){
-        console.log('loop');
-        _this.duration = _this.duration / 2;
+      while (_this.time - _this.last_time > _this.duration){
+        //console.log('loop');
+        _this.duration = _this.duration * 2;
       }
+      console.log(' adj duration: ' + _this.duration);
       /*if ((_this.fields[i].last_refresh + _this.duration * (1/2)) > _this.fields[i].data[_this.fields[i].data.length - 1].x){
         _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
         continue;
