@@ -217,7 +217,7 @@
           console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
           continue;
         }
-        _this.duration = Math.abs(Math.ceil(_this.fields[i].data[_this.fields[i].data.length -2].x - _this.time));
+        _this.duration = Math.abs(Math.ceil(_this.fields[i].data[_this.fields[i].data.length -1].x - _this.time));
         /*while (_this.fields[i].duration.length > 9){
           for (let k = 0; k < 3; k+=2){
             if (Math.abs(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]) > _this.duration){
@@ -336,7 +336,7 @@
         }*/
         _this.fields[i].duration.push(Date.now());
         while (_this.fields[i].duration.length > 1){
-          _this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]))
+          _this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]));
           _this.fields[i].duration.shift();
           console.log('duration shift');
         }
