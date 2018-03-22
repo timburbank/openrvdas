@@ -188,7 +188,7 @@
     let received_message = new_message;
     let keys = Object.keys(received_message);
 
-    if (_this.fields[0].duration.length >= 3){
+    if (_this.fields[0].duration.length >= 9){
       _this.duration = 0; 
       console.log('reset dur: ' + _this.duration);
     }
@@ -196,6 +196,7 @@
     for (let i = 0; i < _this.fields.length; i++){
       //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
+        _this.fields[i].duration.push(Date.now());
         //console.log(received_message[_this.fields[i].field][0]);
         //console.log('\n   received: ' + _this.fields[i].field);
         
@@ -215,8 +216,7 @@
           console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
           continue;
         }
-        _this.fields[i].duration.push(Date.now());
-        while (_this.fields[i].duration.length > 3){
+        while (_this.fields[i].duration.length > 9){
           for (let k = 0; k < 3; k+=2){
             if (Math.abs(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]) > _this.duration){
               _this.duration = Math.abs(Math.ceil(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]));
