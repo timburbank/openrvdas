@@ -378,7 +378,8 @@
             .transition()
             .duration(_this.fields[i].duration[1] - _this.fields[i].duration[0])
             .ease(d3.easeLinear)
-            .attr('transform', 'translate(' + x + ',' + _this.margin + ')');
+            .attr('transform', 'translate(' + -(xScale(data[data.length-1].x) -xScale.range()[0]) + ',' + margin + ')');
+            //.attr('transform', 'translate(' + x + ',' + _this.margin + ')');
 
 //      _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
 
@@ -392,7 +393,6 @@
       while ((_this.fields[i].data.length > 2) && (_this.xScale(_this.fields[i].data[2].x) < 0)){
         console.log('shift');
         _this.fields[i].data.shift();
-        console.log(_this.fields[i].data);
       }
 
       _this.fields[i].line_selection.attr('d', _this.fields[i].line)
