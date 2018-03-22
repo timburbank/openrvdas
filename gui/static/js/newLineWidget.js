@@ -371,8 +371,8 @@
         console.log('continue');
         continue;
       }
-      console.log('  data length: ' + _this.fields[i].data.length);
-      console.log('real duration: ' + _this.last_time - _this.time);
+      //console.log('  data length: ' + _this.fields[i].data.length);
+      console.log('real duration: ' + (_this.last_time - _this.time));
       console.log('data duration: ' + (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x));
       /*if ((_this.fields[i].last_refresh + _this.duration * (1/2)) > _this.fields[i].data[_this.fields[i].data.length - 1].x){
         _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
