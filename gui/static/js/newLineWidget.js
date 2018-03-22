@@ -362,7 +362,7 @@
       }*/
 
       //let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
-      let x = -(_this.xScale(data[data.length-1].x) -_this.xScale.range()[0]);
+      let x = -(_this.xScale(_this.fields[i].data[_this.fields[i].data.length-1].x) -_this.xScale.range()[0]);
       //console.log('x: '+ x);
       //console.log(_this.fields[i].data[_this.fields[i].data.length -1].x - _this.fields[i].data[_this.fields[i].data.length-2].x);
       //let x = _this.xScale.range()[1] / ((parseInt(_this.time_frame) - _this.duration * 5) / _this.duration);
