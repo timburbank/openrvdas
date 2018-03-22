@@ -188,6 +188,13 @@
     let received_message = new_message;
     let keys = Object.keys(received_message);
 
+    try{
+      if (_this.fields[0].duration.leght > 3){
+        _this.duration = 0; 
+      }
+    }catch(e){
+      console.log(e);
+    }
     for (let i = 0; i < _this.fields.length; i++){
       //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
@@ -212,9 +219,7 @@
         }
         _this.fields[i].duration.push(Date.now());
         while (_this.fields[i].duration.length > 3){
-          _this.duration = 0;
           for (let k = 0; k < 3; k+=2){
-            console.log(k);
             if (_this.fields[i].duration[k+1] - _this.fields[i].duration[k] > _this.duration){
               _this.duration = Math.ceil(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]);
             }
