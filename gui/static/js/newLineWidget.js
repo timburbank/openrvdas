@@ -59,6 +59,7 @@
       line_thickness: 3,
       tolerance: 0.5,
       time: Date.now(), // should be time + duration
+      last_time: Date.now(), // should be time + duration
       //random_color: function(){ return Math.floor(Math.random() * (255)); },
       x_scale: 'time',
       y_scale: 'linear',
@@ -196,6 +197,7 @@
     for (let i = 0; i < _this.fields.length; i++){
       //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
+        _this.last_time = _this.time;
         _this.time = Date.now();
         //_this.fields[i].duration.push(Date.now());
         //console.log(received_message[_this.fields[i].field][0]);
@@ -370,7 +372,7 @@
         continue;
       }
       console.log('  data length: ' + _this.fields[i].data.length);
-      console.log('real duration: ' + _this.duration);
+      console.log('real duration: ' + _this.last_time - _this.time);
       console.log('data duration: ' + (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x));
       /*if ((_this.fields[i].last_refresh + _this.duration * (1/2)) > _this.fields[i].data[_this.fields[i].data.length - 1].x){
         _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
