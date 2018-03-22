@@ -198,13 +198,13 @@
         for (let j = 0; j < received_message[_this.fields[i].field].length; j++){
           // [j][0] is time
           // [j][1] is data
-          //console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
+          console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
           //console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
           _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0] * 1000), 
                                      'y': parseFloat(received_message[_this.fields[i].field][j][1])});
           _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
           _this.fields[i].duration.push(_this.time);
-          //console.log('    time is: ' + _this.time + '\n');
+          console.log('    time is: ' + Date.now() + '\n');
         }
 
         if (_this.fields[i].data.length < 2){
@@ -240,7 +240,7 @@
   function getData(){
     console.log('getData');
     // check to make sure that we are running and have fields
-    /*if (_this.running === false){
+    if (_this.running === false){
       console.log('not running');
       return;
     }
@@ -298,7 +298,7 @@
       }
       update.call(this);
     }).bind(this);
-    xhr.send(form_data);*/
+    xhr.send(form_data);
   }
 
   // updates the widget data array
@@ -361,9 +361,14 @@
         continue;
       }*/
 
-      //let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
-      let x = -(_this.xScale(_this.fields[i].data[_this.fields[i].data.length-1].x) -_this.xScale.range()[0]);
-      //console.log('x: '+ x);
+      _this.fields[i].line = d3.line()
+        .x(function(d) { return _this.xScale(d.x); })
+        .y(function(d) { return _this.yScale(d.y); })
+        .curve(_this.fields[j].curve);
+
+      let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
+      //let x = -(_this.xScale(_this.fields[i].data[_this.fields[i].data.length-1].x) -_this.xScale.range()[0]);
+      console.log('x: '+ x);
       //console.log(_this.fields[i].data[_this.fields[i].data.length -1].x - _this.fields[i].data[_this.fields[i].data.length-2].x);
       //let x = _this.xScale.range()[1] / ((parseInt(_this.time_frame) - _this.duration * 5) / _this.duration);
       _this.fields[i].line_selection = d3.select('#' + _this.name)
