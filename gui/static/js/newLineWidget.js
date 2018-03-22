@@ -218,7 +218,7 @@
         _this.fields[i].duration.push(Date.now());
         while (_this.fields[i].duration.length > 3){
           for (let k = 0; k < 3; k+=2){
-            if (_this.fields[i].duration[k+1] - _this.fields[i].duration[k] > _this.duration){
+            if (Math.abs(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]) > _this.duration){
               _this.duration = Math.abs(Math.ceil(_this.fields[i].duration[k+1] - _this.fields[i].duration[k]));
             }
           }
