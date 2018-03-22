@@ -187,17 +187,31 @@
   function process_message(new_message){
     let received_message = new_message;
     let keys = Object.keys(received_message);
-    //console.log(received_message.S330Pitch);
 
     for (let i = 0; i < _this.fields.length; i++){
       console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
         //console.log(received_message[_this.fields[i].field][0]);
-      //if (keys.hasOwnProperty(_this.fields[i].field)){
-      //if (_this.fields[i].field in keys){
-        console.log('received: ' + _this.fields[i].field);
-        console.log('    time: ' + received_message[_this.fields[i].field][0][0]);
-        console.log('    data: ' + received_message[_this.fields[i].field][0][1]);
+        console.log('\n   received: ' + _this.fields[i].field);
+        
+        console.log('data points: ' + received_message[_this.fields[i].field].length);
+        for (let j = 0; j < received_message[_this.fields[i].field].length; j++){
+          // [j][0] is time
+          // [j][1] is data
+          console.log('       time: ' + received_message[_this.fields[i].field][j][0]);
+          console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
+          _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0]), 
+                                     'y': parseFloat(received_message[_this.fields[i].field][j][1])});
+          _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
+          _this.fields[i].duration.push(_this.time);
+          console.log('    time is: ' + _this.time);
+        }
+
+        if (_this.fields[i].data.length < 2){
+          console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
+          continue;
+        }
+        console.log('hit end');
       }
     }
     /*
@@ -217,7 +231,7 @@
       }
     }
     */
-  };
+  }
 
   function getData(){
     console.log('getData');
