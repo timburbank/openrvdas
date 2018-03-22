@@ -227,7 +227,7 @@
           //_this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]));
           //_this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
           _this.fields[i].duration.shift();
-        }
+        //}
       }
       draw.call(this);
     }
