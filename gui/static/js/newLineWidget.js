@@ -189,8 +189,9 @@
     let keys = Object.keys(received_message);
 
     try{
-      if (_this.fields[0].duration.length > 3){
+      if (_this.fields[0].duration.length >= 3){
         _this.duration = 0; 
+        console.log(_this.duration);
       }
     }catch(e){
       console.log(e);
