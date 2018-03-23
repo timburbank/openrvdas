@@ -9,7 +9,7 @@
  * TODO: change fields[i].whatever to use importOptions() not ternary
  * TODO: implement auto line data resolution
  *       should also redraw new line smoothly. fade in new line, and fade out old line at the same rate at the same time
- * TODO: implement funcionality to work with websockets
+ * DONE: implement funcionality to work with websockets
  */
 
  /*jshint esversion: 6 */
@@ -51,7 +51,7 @@
       margin: 30,
       time_frame: 1200000,
       last_refresh: Date.now(),
-      duration: 5000,
+      duration: 1000,
       duration_max: [],
       axis_color: '#a50f15',
       text_color: '#b5b5b7',
@@ -98,24 +98,6 @@
 
   // public functions
   // ***************************************************************************
-  
-  /*
-  this.LineWidget.prototype.initialize = function(){
-    console.log(this.options);
-    initParams.call(this);
-    _this.running = true;
-    getData.call(this);
-  };
-  */
-
-/*
-    var message = [];
-    for (var i = 0; i < fields.length; i++) {
-      message.push([fields[i], num_secs]);
-    }
-    console.log("Initialization message: " + JSON.stringify(message));
-    return message;
-*/
   this.LineWidget.prototype.initalize = function(){
     console.log(this.options);
     console.log(random_color());
@@ -141,8 +123,10 @@
   };
 
   this.LineWidget.prototype.start = function(){
+    this.initalize();
+    this.websocket_setup();
     _this.running = true;
-    getData.call(this);
+    _this.setInt = setInterval(function() { draw.call(this); },_this.duration);
   };
 
   this.LineWidget.prototype.stop = function(){
@@ -197,8 +181,8 @@
     for (let i = 0; i < _this.fields.length; i++){
       //console.log('\n   field: ' + _this.fields[i].field);
       if (received_message.hasOwnProperty(_this.fields[i].field)){
-        _this.last_time = _this.time;
-        _this.time = Date.now();
+        //_this.last_time = _this.time;
+        //_this.time = Date.now();
         //_this.fields[i].duration.push(Date.now());
         //console.log(received_message[_this.fields[i].field][0]);
         //console.log('\n   received: ' + _this.fields[i].field);
@@ -207,20 +191,21 @@
         for (let j = 0; j < received_message[_this.fields[i].field].length; j++){
           // [j][0] is time
           // [j][1] is data
-          console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
+          //console.log('       time: ' + received_message[_this.fields[i].field][j][0] * 1000);
           //console.log('       data: ' + received_message[_this.fields[i].field][j][1]);
           _this.fields[i].data.push({'x': parseFloat(received_message[_this.fields[i].field][j][0] * 1000), 
                                      'y': parseFloat(received_message[_this.fields[i].field][j][1])});
-          //_this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
+          _this.time = _this.fields[i].data[_this.fields[i].data.length -1].x;
+          _this.fields[i].data_length = _this.fields[i].data.length;
           //_this.fields[i].duration.push(_this.time);
         }
 
-        if (_this.fields[i].data.length < 2){
+        /*if (_this.fields[i].data.length < 2){
           console.log(_this.fields[i].field + ' has less than two points. Continuing until it has more.');
           continue;
-        }
+        }*/
 
-        _this.duration = (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x);
+        //_this.duration = (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x);
         //_this.duration = Math.ceil(_this.time - _this.fields[i].data[_this.fields[i].data.length -2].x - (Date.now()  _this.time));
         /*while (_this.fields[i].duration.length > 9){
           for (let k = 0; k < 3; k+=2){
@@ -230,10 +215,24 @@
           }*/
           //_this.duration = parseInt(Math.ceil(_this.fields[i].duration[1])) - parseInt(Math.floor(_this.fields[i].duration[0]));
           //_this.duration = _this.fields[i].duration[1] - _this.fields[i].duration[0];
-          _this.fields[i].duration.shift();
+          //_this.fields[i].duration.shift();
         //}
       }
-      draw.call(this);
+      /*if (_this.last_refresh + _this.refresh_rate > Date.now()){
+        console.log('lst_ref: ' + _this.last_refresh);
+        console.log('ref_rte: ' + _this.refresh_rate);
+        console.log('dte.now: ' + Date.now());
+        console.log('too soon');
+        return;
+      }
+      else{
+        console.log('else');
+        _this.last_refresh = Date.now();
+      }*/
+
+
+
+      //draw.call(this);
     }
     /*
     for (let i = 0; i < _this.fields.length; i++){
@@ -361,6 +360,7 @@
 
   function draw(){
     // select our widget
+    console.log('draw');
     let id = d3.select('#' + _this.name);
 
     let g = id.selectAll('svg')
@@ -371,15 +371,17 @@
         console.log('continue');
         continue;
       }
-      //console.log('  data length: ' + _this.fields[i].data.length);
-      console.log('real duration: ' + (_this.time - _this.last_time));
-      console.log('data duration: ' + (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x));
 
-      while (_this.time - _this.last_time > _this.duration){
+     // else if (_this.field[i].data[_this.fields[i].data.length -1].x === )
+      //console.log('  data length: ' + _this.fields[i].data.length);
+      //console.log('real duration: ' + (_this.time - _this.last_time));
+      //console.log('data duration: ' + (_this.fields[i].data[_this.fields[i].data.length - 1].x - _this.fields[i].data[_this.fields[i].data.length -2].x));
+
+      /*while (_this.time - _this.last_time > _this.duration){
         //console.log('loop');
         _this.duration = _this.duration * 2;
-      }
-      console.log(' adj duration: ' + _this.duration);
+      }*/
+      //console.log(' adj duration: ' + _this.duration);
       /*if ((_this.fields[i].last_refresh + _this.duration * (1/2)) > _this.fields[i].data[_this.fields[i].data.length - 1].x){
         _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
         continue;
@@ -387,7 +389,7 @@
 
       let x = (_this.xScale.range()[0] - _this.xScale(_this.fields[i].data[_this.fields[i].data.length -1].x));
       //let x = -(_this.xScale(_this.fields[i].data[_this.fields[i].data.length-1].x) -_this.xScale.range()[0]);
-      console.log('x: '+ x);
+      //console.log('x: '+ x);
       //console.log(_this.fields[i].data[_this.fields[i].data.length -1].x - _this.fields[i].data[_this.fields[i].data.length-2].x);
       //let x = _this.xScale.range()[1] / ((parseInt(_this.time_frame) - _this.duration * 5) / _this.duration);
       _this.fields[i].line_selection = d3.select('#' + _this.name)
@@ -396,10 +398,19 @@
             .select('g')
             .select('.line_' + i)
             .select('#line_' + i);
-
-      _this.fields[i].line_selection.datum(_this.fields[i].data);
-
-      //console.log(typeof _this.duration + ': ' + _this.duration);
+console.log(_this.fields[i].data[_this.fields[i].data.length -1]);
+      if (_this.fields[i].data_length -1 >= _this.fields[i].data.length){
+        let temp_data = _this.fields[i].data;
+        temp_data.push({'x': _this.fields[i].data[_this.fields[i].data.length -1].x - _this.duration * (_this.fields[i].data_length - _this.fields[i].data.length - 2), 
+                        'y': _this.fields[i].data[_this.fields[i].data.length -1].y});
+         _this.fields[i].line_selection.datum(temp_data);
+        console.log('they equal');
+      }
+      else{
+        _this.fields[i].line_selection.datum(_this.fields[i].data);
+        console.log('not equal');
+      }
+      //console.log('duration: ' + _this.duration);
       _this.fields[i].line_selection.interrupt()
             .transition()
             //.duration(1000)
@@ -408,14 +419,14 @@
             .ease(d3.easeLinear)
             //.attr('transform', 'translate(' + -(_this.xScale(data[data.length-1].x) -_this.xScale.range()[0]) + ',' + _this.margin + ')');
             .attr('transform', 'translate(' + x + ',' + _this.margin + ')');
+     
+      //    _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
 
-//      _this.fields[i].last_refresh = _this.fields[i].data[_this.fields[i].data.length -1].x;
-
-/*      if ((_this.fields[i].data[0].x < (_this.time - parseInt(_this.time_frame)))){
+       /*   if ((_this.fields[i].data[0].x < (_this.time - parseInt(_this.time_frame)))){
         console.log('shifted ' + _this.fields[i].data[0].x);
         _this.fields[i].data.shift();
       }
-*/
+       */
       // have the last two pints gone off the chart? if so shift the array by one
       // also, make sure we keep at least a few points around.
       while ((_this.fields[i].data.length > 2) && (_this.xScale(_this.fields[i].data[2].x) < 0)){
@@ -459,7 +470,6 @@
           _this.fields[i].last_simplification = already_simple.length;
         }
         //console.debug('tolerance: ' + tolerance + '\nsimplify_rate: ' + simplify_rate);
-
       }
       //console.log(_this.fields[i].data[0].x);
 
@@ -501,10 +511,13 @@
       }*/
       // console.log(_this.name + ' data length: ' + _this.fields[i].data.length);
       // console.log(' ');
+      _this.fields[i].data_length += 1;
     }
     switch (_this.x_scale){
     case 'time':
       //_this.xScale.domain([_this.time - (parseInt(_this.time_frame)) + _this.duration * 3, _this.time - _this.duration * 2]);
+      
+      //_this.xScale.domain([_this.time + _this.duration, _this.time + )
       _this.xScale.domain([_this.time, _this.time + (_this.duration * 2) - _this.time_frame]);
       //_this.xScale.domain([_this.time - _this.time_frame, _this.time]);
       break;
@@ -578,6 +591,8 @@
       'fill': 'none',
       'stroke-width': _this.line_thickness,
     });
+    //_this.refresh_rate = Date.now();
+    _this.time += _this.duration;
   }
 
   // sets up the core container structure for the widget
@@ -591,6 +606,7 @@
           _this.fields[i].data = [];
           _this.fields[i].last_refresh = Date.now();
           _this.fields[i].duration = [Date.now()];
+          _this.fields[i].data_length = 0;
         }
       }
     }
