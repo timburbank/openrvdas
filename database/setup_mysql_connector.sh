@@ -25,9 +25,9 @@ PWD=$2
 
 # Create databases if they don't exist, and give user access. Also
 # give user 'test' access to test database.
-#mysql -u root -p$ROOT_PWD <<EOF 
-echo Enter MySQL root password
-mysql -u root -p <<EOF 
+mysql -u root <<EOF 
+#echo Enter MySQL root password
+#mysql -u root -p <<EOF 
 
 drop user if exists 'test'@'localhost'; 
 create user 'test'@'localhost' identified by 'test';

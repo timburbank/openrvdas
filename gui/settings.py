@@ -27,7 +27,8 @@ DEBUG = True
 
 import socket
 HOSTNAME = socket.gethostname()
-HOSTNAME = socket.gethostbyname(socket.gethostname() + '.local')
+HOSTNAME = socket.gethostbyname(socket.gethostname()) # for mac
+# HOSTNAME = socket.gethostbyname(socket.gethostname() + '.local') # for ubuntu
 
 ALLOWED_HOSTS = [HOSTNAME, 'localhost',]
 
