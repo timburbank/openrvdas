@@ -28,7 +28,7 @@
 // WEBSOCKET_SERVER  being set in the calling page.
 
 ////////////////////////////////////////////////////////////////////////////////
-var websocket_server = "ws://" + WEBSOCKET_SERVER + "/";
+var websocket_server = "wss://" + WEBSOCKET_SERVER + "/";
 
 //////////////////////////////////////////////////////////////
 if (! "WebSocket" in window) {

@@ -101,6 +101,7 @@ import pprint
 import queue
 import signal
 import socket  # to get hostname
+import ssl
 import sys
 import threading
 import time
@@ -372,10 +373,16 @@ class LoggerManager:
       last_cruise_def_sent = 0
       last_status_sent = 0
 
+      # Our ssl stuff - don't look for a cert.
+      ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+      ssl_context.check_hostname = False
+      ssl_context.verify_mode = ssl.VerifyMode.CERT_NONE
+
       while not self.quit_flag:
         try:
           logging.info('Connecting to websocket: "%s"', ws_name)
-          async with websockets.connect('ws://' + ws_name) as ws:
+          async with websockets.connect('wss://' + ws_name,
+                                        ssl=ssl_context) as ws:
             while not self.quit_flag:
 
               # Work through the messages in the queue, sending the

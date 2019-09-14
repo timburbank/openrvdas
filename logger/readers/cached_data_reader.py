@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 
 import asyncio
+import ssl
 import json
 import logging
 import queue
 import sys
 import threading
 import time
-
-try:
-  import websockets
-  WEBSOCKETS_ENABLED = True
-except ModuleNotFoundError:
-  WEBSOCKETS_ENABLED = False
+import websockets
 
 from os.path import dirname, realpath; sys.path.append(dirname(dirname(dirname(realpath(__file__)))))
 
@@ -53,11 +49,6 @@ class CachedDataReader(Reader):
                 seconds: 0
     ```
     """
-
-    if not WEBSOCKETS_ENABLED:
-      raise ModuleNotFoundError('CachedDataReader(): websockets module is not '
-                                'installed. Please try "pip3 install '
-                                'websockets" prior to use.')
     self.subscription = subscription
     subscription['type'] = 'subscribe'
     self.data_server = data_server
@@ -113,11 +104,16 @@ class CachedDataReader(Reader):
       """Asynchronous inner function that will read from websocket and put
       the result in our queue.
       """
+      ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+      ssl_context.check_hostname = False
+      ssl_context.verify_mode = ssl.VerifyMode.CERT_NONE
+      
       # Iterate if we lose the websocket for some reason other than a 'quit'
       while not self.quit_flag:
         try:
           logging.info('Connecting to websocket: "%s"', self.data_server)
-          async with websockets.connect('ws://' + self.data_server) as ws:
+          async with websockets.connect('wss://' + self.data_server,
+                                        ssl=ssl_context) as ws:
             # Send our subscription request
             await ws.send(json.dumps(self.subscription))
             result = await ws.recv()

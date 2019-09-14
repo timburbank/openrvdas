@@ -113,6 +113,7 @@ writers:
 ```
 """
 import asyncio
+import ssl
 import json
 import logging
 import pprint
@@ -617,11 +618,20 @@ class CachedDataServer:
   def _run_websocket_server(self):
     """Start serving on the specified websocket.
     """
+    # Set up SSL context - NOTE: this really needs to be cleaned up!
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_dir = dirname(dirname(realpath(__file__))) + '/ssl/'
+    cert_file = ssl_dir + 'openrvdas.crt'
+    key_file = ssl_dir + 'openrvdas.key'
+    ssl_context.load_cert_chain(cert_file, key_file)
+
     logging.info('Starting WebSocketServer on port %d', self.port)
     try:
       self.websocket_server = websockets.serve(
         ws_handler=self._serve_websocket_data,
-        host='', port=self.port, loop=self.event_loop)
+        host='', port=self.port,
+        ssl=ssl_context,
+        loop=self.event_loop)
 
       # If event loop is already running, just add server to task list
       if self.event_loop.is_running():

@@ -3,6 +3,7 @@
 import asyncio
 import json
 import logging
+import ssl
 import sys
 import threading
 import time
@@ -74,12 +75,17 @@ class CachedDataWriter(Writer):
       """Inner async function that actually does websocket writes 
       and cleanups.
       """
+      ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+      ssl_context.check_hostname = False
+      ssl_context.verify_mode = ssl.VerifyMode.CERT_NONE
+
       next_cleanup = 0
       while True:
         logging.info('CachedDataWriter trying to connect to '
                      + self.data_server)
         try:
-          async with websockets.connect('ws://' + self.data_server) as ws:
+          async with websockets.connect('wss://' + self.data_server,
+                                        ssl=ssl_context) as ws:
             while True:
               try:
                 record = self.send_queue.get_nowait()
