@@ -1,0 +1,20 @@
+---
+##
+## Parser for Kerbal Space Program data, transmitted by rk2
+
+Rk2SimTime:
+    category: "device_type"
+    description: "Simulation time transmitted by rk2"
+
+    format: "ut	{SimTime:f}"
+
+
+
+
+simtime:
+    category: "device"
+    device_type: "Rk2SimTime"
+    description: "Simulation time transmitted by rk2"
+
+    fields:
+        SimTime: "SimTime"

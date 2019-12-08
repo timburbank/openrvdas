@@ -1,0 +1,94 @@
+---
+######################################
+# Test cruise definition for OpenRVDAS
+######################################
+
+loggers:
+  rk2:
+    configs:
+    - rk2->off
+    # - testdata->net
+    - rk2->file
+    # - testdata->file/net
+    # - testdata->file/net/db
+  
+
+  ## simtime is transmitted on it's own port so it can get 
+  ## it's own logger, so we can send it to cache
+  simtime:
+    configs:
+      - simtime->off
+      - simtime->cache
+
+modes:
+  'off':
+    rk2: rk2->off
+    simtime: simtime->off
+
+  # monitor:
+  #   testdata: testdata->net
+
+  log:
+    rk2: rk2->file
+    simtime: simtime->cache
+
+  # 'log+db':
+  #   testdata: testdata->file/net/db
+
+default_mode: 'off'
+
+configs:
+  rk2->off:
+    name: rk2->off
+
+  simtime->off:
+    name: simtime->off
+
+
+  simtime->cache:
+    name: simtime->cache
+    readers:
+      class: NetworkReader
+      kwargs:
+        network: ':5007'
+    transforms:
+      - class: TimestampTransform
+      - class: PrefixTransform
+        kwargs:
+          prefix: simtime
+      - class: ParseTransform
+        kwargs:
+          definition_path: /opt/openrvdas/local/sciopsim/devices/*.yaml
+    writers:
+      - class: TextFileWriter
+        kwargs:
+          filename: /home/rvdas/datalog/simtime.log
+    stderr_writers:
+      - class: TextFileWriter
+        kwargs:
+          filename: /home/rvdas/datalog/error_simtime.log
+
+  rk2->file:
+    name: rk2->file
+    readers:
+      class: NetworkReader
+      kwargs:
+        network: ':5006'
+
+    writers:
+#      - class: UDPWriter
+#        kwargs:
+#          destination: '68.183.48.190'
+#          port: 6667
+#
+      - class: ComposedWriter
+        kwargs:
+          transforms:
+            - class: TimestampTransform
+              kwargs:
+                sep: '	'
+          writers:
+            - class: LogfileWriter
+              kwargs:
+                filebase: /home/rvdas/datalog/rk2
+

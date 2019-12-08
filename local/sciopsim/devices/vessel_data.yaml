@@ -1,0 +1,24 @@
+---
+##
+## Parser for Kerbal Space Program data, transmitted by rk2
+
+VesselTelemetry:
+    category: "device_type"
+    description: "All types of vessel data"
+
+    format:
+        - "{VesselName:w}	{ParamName:w}	{Data:f}"
+        - "{VesselName:w}	{ParamName:w}	{X:f}	{Y:f}	{Z:f}"
+
+
+vessel:
+    category: "device"
+    device_type: "VesselTelemetry"
+    description: "All telemetry is logged in the same format"
+
+    fields:
+        VesselName: "VesselName"
+        Data: "Data"
+        X: "X"
+        Y: "Y"
+        Z: "Z"

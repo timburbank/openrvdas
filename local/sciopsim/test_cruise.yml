@@ -1,0 +1,60 @@
+---
+######################################
+# Test cruise definition for OpenRVDAS
+######################################
+
+loggers:
+  testdata:
+    configs:
+    - testdata->off
+    # - testdata->net
+    - testdata->file
+    # - testdata->file/net
+    # - testdata->file/net/db
+
+modes:
+  'off':
+    testdata: testdata->off
+
+  # monitor:
+  #   testdata: testdata->net
+
+  log:
+    testdata: testdata->file
+
+  # 'log+db':
+  #   testdata: testdata->file/net/db
+
+default_mode: 'off'
+
+configs:
+  testdata->off:
+    name: testdata->off
+
+  testdata->file:
+    name: testdata->file
+    readers:
+      class: NetworkReader
+      kwargs:
+        network: ':5005'
+
+    writers:
+      - class: UDPWriter
+        kwargs:
+          destination: '68.183.48.190'
+          port: 6667
+      - class: ComposedWriter
+        kwargs:
+          transforms:
+            - class: PrefixTransform
+              kwargs:
+                prefix: TEST
+                sep: '	'
+            - class: TimestampTransform
+              kwargs:
+                sep: '	'
+          writers:
+            - class: LogfileWriter
+              kwargs:
+                filebase: /home/rvdas/datalog/TEST
+
