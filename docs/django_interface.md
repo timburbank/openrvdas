@@ -18,7 +18,7 @@ While most of the system's core functionality can be accessed via individual com
 
 The code repository currently lives at [https://github.com/oceandatatools/openrvdas](https://github.com/oceandatatools/openrvdas), with installation instructions that can be found on the project's [INSTALL.md](../INSTALL.md) page. This document assumes that you have installed OpenRVDAS using one of the standard installation scripts described on that page.
 
-If you have selected "yes" to run OpenRVDAS servers on start, then both the  ``logger_manager.py`` and ``cached_data_server.py`` should be running (you can check by running ``supervisorctl`` as root).
+If you have selected "yes" to run OpenRVDAS servers on start, then both the  ``logger_manager.py`` and ``cached_data_server.py`` should be running (you can check by running ``supervisorctl``).
 
 At this point you can point your browser to
 
@@ -48,26 +48,29 @@ its loggers, you'll need to set those up. You can manually run the
 script that sets the ports up:
 
 ```
-  python3 logger/utils/simulate_serial.py \
-    --config test/NBP1406/serial_sim_NBP1406.yaml --loop
+  python3 logger/utils/simulate_data.py \
+    --config test/NBP1406/simulate_NBP1406.yaml
 ```
 
 or use the pre-installed ``supervisor`` configuration to have
-supervisord start and monitor the process for you:
+supervisord start and monitor the process for you. You can do this two
+ways, either via the local webserver at
+[http://openrvdas:8001](http://openrvdas:8001) (assuming your machine
+is named 'openrvdas') or via the command line ``supervisorctl`` tool:
 
 ```
 root@openrvdas:~# supervisorctl
 cached_data_server               RUNNING   pid 5641, uptime 0:12:00
 logger_manager                   RUNNING   pid 5646, uptime 0:11:59
-simulate_serial                  STOPPED   Oct 05 03:22 AM
+simulate_nbp                     STOPPED   Oct 05 03:22 AM
 
-supervisor> start simulate_serial
-simulate_serial: started
+supervisor> start simulate_nbp
+simulate_nbp: started
 
 supervisor> status
 cached_data_server               RUNNING   pid 5641, uptime 0:12:13
 logger_manager                   RUNNING   pid 5646, uptime 0:12:12
-simulate_serial                  RUNNING   pid 5817, uptime 0:00:05
+simulate_nbp                     RUNNING   pid 5817, uptime 0:00:05
 
 supervisor> exit
 ```

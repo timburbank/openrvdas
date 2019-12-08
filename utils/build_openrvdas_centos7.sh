@@ -35,14 +35,6 @@ fi
 
 echo "############################################################################"
 echo OpenRVDAS configuration script
-while true; do
-    read -p "Do you wish to continue? " yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
 
 read -p "Name to assign to host ($DEFAULT_HOSTNAME)? " HOSTNAME
 HOSTNAME=${HOSTNAME:-$DEFAULT_HOSTNAME}
@@ -85,11 +77,17 @@ fi
 
 # Get current and new passwords for database
 echo
-read -p "Database password to use for $RVDAS_USER? ($RVDAS_USER) " RVDAS_DATABASE_PASSWORD
-RVDAS_DATABASE_PASSWORD=${RVDAS_DATABASE_PASSWORD:-$RVDAS_USER}
-read -p "Current database password for root? (if one exists - hit return if not) " CURRENT_ROOT_DATABASE_PASSWORD
+echo Root database password will be empty on initial installation. If this
+echo is the initial installation, hit "return" when prompted for root
+echo database password, otherwise enter the password you used during the
+echo initial installation.
+echo
+echo Current database password for root \(hit return if this is the
+read -p "initial installation)? " CURRENT_ROOT_DATABASE_PASSWORD
 read -p "New database password for root? ($CURRENT_ROOT_DATABASE_PASSWORD) " NEW_ROOT_DATABASE_PASSWORD
 NEW_ROOT_DATABASE_PASSWORD=${NEW_ROOT_DATABASE_PASSWORD:-$CURRENT_ROOT_DATABASE_PASSWORD}
+read -p "Database password to use for user $RVDAS_USER? ($RVDAS_USER) " RVDAS_DATABASE_PASSWORD
+RVDAS_DATABASE_PASSWORD=${RVDAS_DATABASE_PASSWORD:-$RVDAS_USER}
 
 echo
 echo "############################################################################"
@@ -165,6 +163,7 @@ systemctl enable firewalld
 firewall-cmd -q --permanent --add-port=80/tcp > /dev/null
 firewall-cmd -q --permanent --add-port=8000/tcp > /dev/null
 firewall-cmd -q --permanent --add-port=8001/tcp > /dev/null
+firewall-cmd -q --permanent --add-port=8002/tcp > /dev/null
 
 # Websocket ports
 firewall-cmd -q --permanent --add-port=8765/tcp > /dev/null # status
@@ -249,9 +248,8 @@ echo Done setting up database
 echo "############################################################################"
 
 echo Installing Django, uWSGI and other Python-dependent packages
-export PATH=/usr/bin:/usr/local/bin:$PATH
-/usr/bin/env pip3 install --upgrade pip
-/usr/local/bin/pip3 install Django==2.2 pyserial uwsgi \
+#export PATH=/usr/local/bin:/usr/bin:$PATH
+/usr/bin/pip3 install Django==2.2 pyserial uwsgi psutil \
                    websockets PyYAML parse mysqlclient mysql-connector diskcache
 # uWSGI configuration
 #Following instructions in https://www.tecmint.com/create-new-service-units-in-systemd/
@@ -348,7 +346,8 @@ sed -i -e "s/localhost/${HOSTNAME}/g" display/js/widgets/settings.js
 
 python3 manage.py makemigrations django_gui
 python3 manage.py migrate
-python3 manage.py collectstatic --no-input --clear --link
+rm -rf static
+python3 manage.py collectstatic --no-input --clear --link -v 0
 chmod -R og+rX static
 
 # A temporary hack to allow the display/ pages to be accessed by Django
@@ -484,6 +483,11 @@ file=/var/run/supervisor/supervisor.sock ; (the path to the socket file)
 chmod=0770                               ; socket file mode (default 0700)
 chown=nobody:${RVDAS_USER}
 
+[inet_http_server]
+port=*:8001
+username=${RVDAS_USER}
+password=${RVDAS_USER}
+
 ; The scripts we're going to run
 [program:cached_data_server]
 command=/usr/bin/python3 server/cached_data_server.py --port 8766 --disk_cache /var/tmp/openrvdas/disk_cache --max_records 8640 -v
@@ -496,7 +500,7 @@ stdout_logfile=/var/log/openrvdas/cached_data_server.out.log
 user=$RVDAS_USER
 
 [program:logger_manager]
-command=/usr/bin/python3 server/logger_manager.py --database django --no-console --data_server_websocket :8766 -v
+command=/usr/bin/python3 server/logger_manager.py --database django --no-console --data_server_websocket :8766  --start_supervisor_in /var/tmp/openrvdas/supervisor -v
 directory=${INSTALL_ROOT}/openrvdas
 autostart=$SUPERVISOR_AUTOSTART
 autorestart=true
@@ -505,16 +509,27 @@ stderr_logfile=/var/log/openrvdas/logger_manager.err.log
 stdout_logfile=/var/log/openrvdas/logger_manager.out.log
 user=$RVDAS_USER
 
-[program:simulate_serial]
-command=/usr/bin/python3 logger/utils/simulate_serial.py --config test/NBP1406/serial_sim_NBP1406.yaml --loop
+[program:simulate_nbp]
+command=/usr/bin/python3 logger/utils/simulate_data.py --config test/NBP1406/simulate_NBP1406.yaml
 directory=${INSTALL_ROOT}/openrvdas
 autostart=false
 autorestart=true
 startretries=3
-stderr_logfile=/var/log/openrvdas/simulate_serial.err.log
-stdout_logfile=/var/log/openrvdas/simulate_serial.out.log
+stderr_logfile=/var/log/openrvdas/simulate_nbp.err.log
+stdout_logfile=/var/log/openrvdas/simulate_nbp.out.log
+user=$RVDAS_USER
+
+[program:simulate_skq]
+command=/usr/bin/python3 logger/utils/simulate_data.py --config test/SKQ201822S/simulate_SKQ201822S.yaml
+directory=${INSTALL_ROOT}/openrvdas
+autostart=false
+autorestart=true
+startretries=3
+stderr_logfile=/var/log/openrvdas/simulate_skq.err.log
+stdout_logfile=/var/log/openrvdas/simulate_skq.out.log
 user=$RVDAS_USER
 EOF
+
 mkdir -p /var/run/supervisor/
 chgrp $RVDAS_USER /var/run/supervisor
 
